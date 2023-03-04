@@ -90,6 +90,10 @@ pub async fn main() -> Result<(), JsValue> {
 
     log!("Created a room with id {}", room_id);
 
+    rtc_client.lock().map(|mut i| {
+        log!("Polling RTC {:?}", i.get_next_event());
+    });
+
 
 
     player.initialize()?;

@@ -14,6 +14,7 @@ pub trait NetworkInterface {
     fn get_next_event(&mut self) -> Option<SyncEvent>;
 }
 
+#[derive(Debug)]
 pub enum SyncEvent {
     Play,
     Pause,

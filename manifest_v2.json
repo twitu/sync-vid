@@ -7,7 +7,7 @@
         {
             "matches": [
                 "*://*.example.com/*",
-                "https://www.youtube.com/watch"
+                "https://www.youtube.com/*"
             ],
             "js": [
                 "sync_vid_extension.js", "run_wasm.js"

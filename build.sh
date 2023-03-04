@@ -23,6 +23,9 @@ else
   fi
 fi
 
+
+sed -i '' 's/document.currentScript.src/\"sync_vid_extension.js\"/' pkg/sync_vid_extension.js
+
 printf "
 const runtime = chrome.runtime || browser.runtime;
 

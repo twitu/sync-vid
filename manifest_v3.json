@@ -5,7 +5,10 @@
     "permissions": [],
     "content_scripts": [
         {
-            "matches": ["*://*.example.com/*"],
+            "matches": [
+                "*://*.example.com/*",
+                "https://www.youtube.com/*"
+            ],
             "js": [
                 "sync_vid_extension.js", "run_wasm.js"
             ]
@@ -13,7 +16,10 @@
     ],
     "web_accessible_resources": [{
         "resources": ["sync_vid_extension_bg.wasm"],
-        "matches": ["*://*.example.com/*"]
+        "matches": [
+            "*://*.example.com/*",
+            "https://www.youtube.com/*"
+        ]
     }],
     "manifest_version": 3
 }
