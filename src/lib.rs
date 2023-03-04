@@ -3,8 +3,8 @@ use wasm_bindgen::{prelude::*, JsCast};
 use web_sys::*;
 
 use crate::players::PlayerInterface;
-pub mod players;
 pub mod network;
+pub mod players;
 
 macro_rules! log {
     ( $( $t:tt )* ) => {
@@ -82,7 +82,7 @@ pub async fn main() -> Result<(), JsValue> {
     let _body = document.body().expect("document should have a body");
 
     let mut player = players::get_player()?;
- 
+
     player.initialize()?;
     let onpause = Closure::<dyn FnMut(Event)>::new(move |event: Event| {
         let video = HtmlVideoElement::from(JsValue::from(event.target().unwrap()));

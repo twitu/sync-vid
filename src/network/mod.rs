@@ -1,7 +1,9 @@
 pub mod matchbox_webrtc;
 
 pub trait NetworkInterface {
-    fn create_room() -> (Self, String) where Self: Sized;
+    fn create_room() -> (Self, String)
+    where
+        Self: Sized;
     fn join_room(room_id: &String) -> Self;
     fn get_room_id(&self) -> &String;
 
@@ -15,5 +17,5 @@ pub trait NetworkInterface {
 pub enum SyncEvent {
     Play,
     Pause,
-    Seek(std::time::Duration)
+    Seek(std::time::Duration),
 }
