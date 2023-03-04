@@ -1,8 +1,10 @@
+use std::sync::{Arc, Mutex};
+
 use once_cell::sync::OnceCell;
 use wasm_bindgen::{prelude::*, JsCast};
 use web_sys::*;
 
-use crate::players::PlayerInterface;
+use crate::{players::PlayerInterface, network::NetworkInterface};
 pub mod network;
 pub mod players;
 
@@ -83,13 +85,32 @@ pub async fn main() -> Result<(), JsValue> {
 
     let mut player = players::get_player()?;
 
+    let (network, room_id) = network::matchbox_webrtc::Client::create_room();
+    let rtc_client = Arc::new(Mutex::new(network));
+
+    log!("Created a room with id {}", room_id);
+
+
+
     player.initialize()?;
+    let rtc_pause = rtc_client.clone();
     let onpause = Closure::<dyn FnMut(Event)>::new(move |event: Event| {
         let video = HtmlVideoElement::from(JsValue::from(event.target().unwrap()));
+        if let Ok(mut client) = rtc_pause.clone().lock() {
+            client.pause_video();
+        } else {
+            log!("Failed to acquire lock for pausing video");
+        }
         log!("We're paused at {}", video.current_time());
     });
+    let rtc_play = rtc_client.clone();
     let onplay = Closure::<dyn FnMut(Event)>::new(move |event: Event| {
         let video = HtmlVideoElement::from(JsValue::from(event.target().unwrap()));
+        if let Ok(mut client) = rtc_play.clone().lock() {
+            client.play_video();
+        } else {
+            log!("Failed to acquire lock for playing video");
+        }
         log!("We're playing at {}", video.current_time());
     });
     console::log_2(&"Player video".into(), player.get_video().unwrap().as_ref());
