@@ -5,7 +5,10 @@
     "permissions": [],
     "content_scripts": [
         {
-            "matches": ["*://*.example.com/*"],
+            "matches": [
+                "*://*.example.com/*",
+                "https://www.youtube.com/watch"
+            ],
             "js": [
                 "sync_vid_extension.js", "run_wasm.js"
             ]
