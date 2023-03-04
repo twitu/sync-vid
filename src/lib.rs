@@ -4,6 +4,7 @@ use web_sys::*;
 
 use crate::players::PlayerInterface;
 pub mod players;
+pub mod network;
 
 macro_rules! log {
     ( $( $t:tt )* ) => {
