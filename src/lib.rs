@@ -1,5 +1,7 @@
 use wasm_bindgen::{prelude::*, JsCast};
 use web_sys::*;
+
+use crate::players::player_interface::PlayerInterface;
 pub mod players;
 
 macro_rules! log {
@@ -15,31 +17,29 @@ pub async fn main() -> Result<(), JsValue> {
     log!("Hello World!");
     let window = web_sys::window().expect("no global `window` exists");
     let document = window.document().expect("should have a document on window");
-    let body = document.body().expect("document should have a body");
+    let _body = document.body().expect("document should have a body");
 
-    let player = players::get_player()?;
-
-    // Manufacture the element we're gonna append
-    let val = document.create_element("p")?;
-    val.set_text_content(Some("Hello from Rust!"));
+    let mut player = players::get_player()?;
+ 
+    player.initialize()?;
+    let onpause = Closure::<dyn FnMut(Event)>::new(move |event: Event| {
+        let video = HtmlVideoElement::from(JsValue::from(event.target().unwrap()));
+        log!("We're paused at {}", video.current_time());
+ 
+    });
+    let onplay = Closure::<dyn FnMut(Event)>::new(move |event: Event| {
+        let video = HtmlVideoElement::from(JsValue::from(event.target().unwrap()));
+        log!("We're playing at {}", video.current_time());
+ 
+    });
+    console::log_2(&"Player video".into(), player.get_video().unwrap().as_ref());
+ 
+    player.get_video().unwrap().set_onpause(Some(onpause.as_ref().unchecked_ref()));
     
-    let video = document.create_element("video")?;
-    video.set_attribute("src", "https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4")?;
-    video.set_attribute("controls", "")?;
-
-    let a = Closure::<dyn FnMut(JsValue)>::new(move |_event: JsValue| {
-        log!("playing vid here");
-    });
-    let b = Closure::<dyn FnMut(JsValue)>::new(move |_event: JsValue| {
-        log!("pause vid here");
-    });
-    video.add_event_listener_with_callback("play", a.as_ref().unchecked_ref())?;
-    video.add_event_listener_with_callback("pause", b.as_ref().unchecked_ref())?;
-    body.append_child(&val)?;
-    body.append_child(&video)?;
-
-    a.forget();
-    b.forget();
-
+    player.get_video().unwrap().set_onplay(Some(onplay.as_ref().unchecked_ref()));
+ 
+    onpause.forget();
+    onplay.forget();
+    
     Ok(())
 }
