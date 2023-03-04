@@ -1,7 +1,7 @@
 [package]
-name = "{{project-name}}"
+name = "sync-vid-extension"
 version = "0.1.0"
-authors = ["{{authors}}"]
+authors = ["bhanuka.ishan@gmail.com"]
 edition = "2018"
 
 [lib]
@@ -17,5 +17,11 @@ console_error_panic_hook = "0.1.6"
 version = "0.3"
 features = [
     "console",
-    "Window"
+    "Window",
+    "Document",
+    'Document',
+    'Element',
+    'HtmlElement',
+    'Node',
+    'Window', 
 ]

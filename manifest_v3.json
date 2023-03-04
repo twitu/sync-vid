@@ -1,18 +1,18 @@
 {
-    "name" : "{{project-name}}",
+    "name" : "sync-vid-extension",
     "version" : "1.0",
-    "description" : "{{project-name}}",
+    "description" : "Sync play the browser video player for cool watch parties",
     "permissions": [],
     "content_scripts": [
         {
             "matches": ["*://*.example.com/*"],
             "js": [
-                "{{crate_name}}.js", "run_wasm.js"
+                "sync_vid_extension.js", "run_wasm.js"
             ]
         }
     ],
     "web_accessible_resources": [{
-        "resources": ["{{crate_name}}_bg.wasm"],
+        "resources": ["sync_vid_extension_bg.wasm"],
         "matches": ["*://*.example.com/*"]
     }],
     "manifest_version": 3

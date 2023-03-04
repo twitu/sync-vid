@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <video controls id="video-player">
+      <source src="/home/twitu/Downloads/Yellow Submarine.mp4" type="video/mp4">
+    </video>
+    <script>
+        document.getElementById("video-player").addEventListener("play", (event) => {
+            console.log("play video");
+            console.log("current time " + event.srcElement.currentTime);
+            console.log(event);
+        });
+        document.getElementById("video-player").addEventListener("playing", (event) => {
+            console.log("playing video");
+            console.log("current time " + event.srcElement.currentTime);
+            console.log(event);
+        });
+        document.getElementById("video-player").addEventListener("pause", (event) => {
+            console.log("pause video");
+            console.log("current time " + event.srcElement.currentTime);
+            console.log(event);
+        });
+        document.getElementById("video-player").addEventListener("seeked", (event) => {
+            console.log("seeked video");
+            console.log("current time " + event.srcElement.currentTime);
+            console.log(event);
+        });
+        document.getElementById("video-player").addEventListener("seeking", (event) => {
+            console.log("seeking video");
+            console.log("current time " + event.srcElement.currentTime);
+            console.log(event);
+        });
+    </script>
+  </body>
+</html>

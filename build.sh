@@ -27,7 +27,7 @@ printf "
 const runtime = chrome.runtime || browser.runtime;
 
 async function run() {
-  await wasm_bindgen(runtime.getURL('{{crate_name}}_bg.wasm'));
+  await wasm_bindgen(runtime.getURL('sync_vid_extension_bg.wasm'));
 }
 
 run();
