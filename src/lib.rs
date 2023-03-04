@@ -21,6 +21,7 @@ pub async fn main() -> Result<(), JsValue> {
     val.set_text_content(Some("Hello from Rust!"));
     
     let video = document.create_element("video")?;
+    video.set_attribute("src", "https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4")?;
     video.set_attribute("controls", "")?;
 
     let a = Closure::<dyn FnMut(JsValue)>::new(move |_event: JsValue| {
@@ -33,6 +34,9 @@ pub async fn main() -> Result<(), JsValue> {
     video.add_event_listener_with_callback("pause", b.as_ref().unchecked_ref())?;
     body.append_child(&val)?;
     body.append_child(&video)?;
+
+    a.forget();
+    b.forget();
 
     Ok(())
 }
