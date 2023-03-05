@@ -14,7 +14,7 @@ use super::{NetworkInterface, SyncEvent}; // 0.8
 pub struct Client {
     room_id: String,
     url: String,
-    socket: WebRtcSocket,
+    pub socket: WebRtcSocket,
     shutdown_receiver: oneshot::Receiver<bool>,
     local_pool: LocalPool,
 }
