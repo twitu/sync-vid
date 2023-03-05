@@ -4,7 +4,10 @@ use once_cell::sync::OnceCell;
 use wasm_bindgen::{prelude::*, JsCast};
 use web_sys::*;
 
-use crate::{players::PlayerInterface, network::{NetworkInterface, SyncEvent}};
+use crate::{
+    network::{NetworkInterface, SyncEvent},
+    players::PlayerInterface,
+};
 pub mod network;
 pub mod players;
 
@@ -83,7 +86,7 @@ pub async fn main() -> Result<(), JsValue> {
     let document = window.document().expect("should have a document on window");
     let _body = document.body().expect("document should have a body");
 
-    let player = Arc::new(Mutex::new(players::get_player()?));
+    let mut player = players::get_player()?;
 
     let room_id = String::from("231");
 
@@ -92,32 +95,23 @@ pub async fn main() -> Result<(), JsValue> {
 
     log!("Created a room with id {}", room_id);
 
-    rtc_client.lock().map(|mut i| {
-        log!("Polling RTC {:?}", i.get_next_event());
-    }).map_err(|er| {
-        log!("Failed to lock mutex {:?}", er);
-    }).ok().unwrap();
+    rtc_client
+        .lock()
+        .map(|mut i| {
+            log!("Polling RTC {:?}", i.get_next_event());
+        })
+        .map_err(|er| {
+            log!("Failed to lock mutex {:?}", er);
+        })
+        .ok()
+        .unwrap();
 
     // window.set_interval_with_callback_and_timeout_and_arguments_0(handler, 100);
 
     let rtc_loop = rtc_client.clone();
-    let player_loop = player.clone();
-    let loop_handler = Closure::<dyn Fn()>::new(move || {
-        if let (Ok(mut client), Ok(player)) = (rtc_loop.lock(), player_loop.lock()) {
-            if let Some(event) = client.get_next_event() {
-                match (event, player.get_video()) {
-                    (SyncEvent::Play, Some(i)) => i.pause(),
-                    (SyncEvent::Pause, Some(i)) => i.play().map(|i| ()),
-                    (SyncEvent::Seek(d), Some(i)) => Ok(i.set_current_time(d.as_secs_f64())),
-                    _ => {Ok(())}
-                }.map_err(|er| {
-                    log!("Error handling event {:?}", er)
-                }).unwrap();
-            }
-        }
-    });
 
-    player.lock().unwrap().initialize()?;
+    player.initialize()?;
+
     let rtc_pause = rtc_client.clone();
     let onpause = Closure::<dyn FnMut(Event)>::new(move |event: Event| {
         let video = HtmlVideoElement::from(JsValue::from(event.target().unwrap()));
@@ -138,29 +132,46 @@ pub async fn main() -> Result<(), JsValue> {
         }
         log!("We're playing at {}", video.current_time());
     });
-    console::log_2(&"Player video".into(), player.lock().unwrap().get_video().unwrap().as_ref());
+    console::log_2(&"Player video".into(), player.get_video().unwrap().as_ref());
 
     player
-        .lock()
-        .unwrap()
         .get_video()
         .unwrap()
         .set_onpause(Some(onpause.as_ref().unchecked_ref()));
 
     player
-        .lock()
-        .unwrap()
         .get_video()
         .unwrap()
         .set_onplay(Some(onplay.as_ref().unchecked_ref()));
 
-    let interval_id = window.set_interval_with_callback_and_timeout_and_arguments_0(loop_handler.as_ref().unchecked_ref(), 100).unwrap();
+    onpause.forget();
+    onplay.forget();
+
+    let loop_handler = Closure::<dyn Fn()>::new(move || {
+        if let Ok(mut client) = rtc_loop.lock() {
+            if let Some(event) = client.get_next_event() {
+                match (event, player.get_video()) {
+                    (SyncEvent::Play, Some(i)) => i.pause(),
+                    (SyncEvent::Pause, Some(i)) => i.play().map(|i| ()),
+                    (SyncEvent::Seek(d), Some(i)) => Ok(i.set_current_time(d.as_secs_f64())),
+                    _ => Ok(()),
+                }
+                .map_err(|er| log!("Error handling event {:?}", er))
+                .unwrap();
+            }
+        }
+    });
+    let interval_id = window
+        .set_interval_with_callback_and_timeout_and_arguments_0(
+            loop_handler.as_ref().unchecked_ref(),
+            100,
+        )
+        .unwrap();
+    loop_handler.forget();
 
     log!("Interval ID {}", interval_id);
 
-    onpause.forget();
-    onplay.forget();
-    loop_handler.forget();
     unsafe { VIDEO_ELEMENT.set(VideoPlayer::default()).unwrap() };
+
     Ok(())
 }
