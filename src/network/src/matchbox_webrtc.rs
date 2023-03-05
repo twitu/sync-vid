@@ -78,6 +78,7 @@ impl NetworkInterface for Client {
 
     fn get_next_event(&mut self) -> Option<SyncEvent> {
         self.local_pool.run_until_stalled();
+        self.socket.accept_new_connections();
         if self.shutdown_receiver.try_recv() == Ok(Some(true)) {
             return None;
         }
@@ -86,9 +87,9 @@ impl NetworkInterface for Client {
             .receive()
             .iter()
             .map(|(peer, data)| {
-                web_sys::console::log_1(
-                    &format!("Received Data Results: {:?} from {}", &data, &peer).into(),
-                );
+                // web_sys::console::log_1(
+                //     &format!("Received Data Results: {:?} from {}", &data, &peer).into(),
+                // );
                 (peer, data)
             })
             .last()

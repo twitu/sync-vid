@@ -4,11 +4,9 @@ use once_cell::sync::OnceCell;
 use wasm_bindgen::{prelude::*, JsCast};
 use web_sys::*;
 
-use crate::{
-    network::{NetworkInterface, SyncEvent},
-    players::PlayerInterface,
-};
-pub mod network;
+use crate::players::PlayerInterface;
+use sync_vid_network::{matchbox_webrtc::Client, NetworkInterface, SyncEvent};
+// pub mod network;
 pub mod players;
 
 macro_rules! log {
@@ -90,7 +88,7 @@ pub async fn main() -> Result<(), JsValue> {
 
     let room_id = String::from("231");
 
-    let network = network::matchbox_webrtc::Client::join_room(&room_id);
+    let network = Client::join_room(&room_id);
     let rtc_client = Arc::new(Mutex::new(network));
 
     log!("Created a room with id {}", room_id);
